@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class GenericBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.message_content = True
+        intents.message_content = False # Not required for slash commands
         intents.dm_messages = True
         
         super().__init__(

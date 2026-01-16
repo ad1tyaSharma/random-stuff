@@ -16,6 +16,11 @@ class SchedulerService:
         self.is_running_check = False
 
     def start(self):
+        # Prevent double start
+        if self.scheduler.running:
+            logger.warning("Scheduler already running.")
+            return
+
         # Schedule check based on config interval
         trigger = CronTrigger(minute=f"*/{settings.CHECK_INTERVAL_MINUTES}")
         self.scheduler.add_job(self.run_check, trigger)
