@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the application
-CMD ["python", "src/main.py"]
+CMD ["python", "-m", "src.main"]
