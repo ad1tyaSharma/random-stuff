@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Stock Tracker - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📦</span>
+                <h1>Amul Stock Tracker</h1>
+            </div>
+            <div class="stats-bar" id="stats-bar">
+                <div class="stat">
+                    <span class="stat-value" id="stat-total">0</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value stat-green" id="stat-instock">0</span>
+                    <span class="stat-label">In Stock</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value stat-red" id="stat-outstock">0</span>
+                    <span class="stat-label">Out of Stock</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Add Product Section -->
+            <section class="card add-product-card">
+                <h2>➕ Add Product to Track</h2>
+                <form id="add-product-form" class="add-product-form">
+                    <div class="input-group">
+                        <input 
+                            type="url" 
+                            id="product-url" 
+                            placeholder="Paste Amul product URL here..."
+                            required
+                        >
+                        <button type="submit" class="btn btn-primary" id="add-btn">
+                            <span class="btn-text">Add Product</span>
+                            <span class="btn-loader" hidden>⏳</span>
+                        </button>
+                    </div>
+                    <p class="hint">Example: https://shop.amul.com/en/product/amul-whey-protein-32-g-or-pack-of-30-sachets</p>
+                </form>
+            </section>
+
+            <!-- Actions Section -->
+            <section class="actions">
+                <button class="btn btn-secondary" id="refresh-btn">
+                    🔄 Refresh
+                </button>
+                <button class="btn btn-accent" id="force-check-btn">
+                    ⚡ Force Check
+                </button>
+            </section>
+
+            <!-- Products Grid -->
+            <section class="products-section">
+                <h2>📋 Tracked Products</h2>
+                <div class="products-grid" id="products-grid">
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Loading products...</p>
+                    </div>
+                </div>
+                <div class="empty-state" id="empty-state" hidden>
+                    <span class="empty-icon">📭</span>
+                    <h3>No products tracked yet</h3>
+                    <p>Add a product URL above to start tracking</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ for Amul lovers • Auto-refreshes every 30 seconds</p>
+        </footer>
+    </div>
+
+    <!-- Product Card Template -->
+    <template id="product-card-template">
+        <div class="product-card">
+            <div class="product-image">
+                <img src="" alt="Product Image">
+                <span class="status-badge"></span>
+            </div>
+            <div class="product-info">
+                <h3 class="product-name"></h3>
+                <div class="product-meta">
+                    <span class="last-checked"></span>
+                    <span class="subscribers"></span>
+                </div>
+                <a class="product-link" href="" target="_blank">View on Amul →</a>
+            </div>
+            <div class="product-actions">
+                <button class="btn btn-delete" title="Remove from tracking">🗑️</button>
+            </div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
