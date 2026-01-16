@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Stock Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-bottle-droplet"></i>
+                <h1>Stock<span>Bot</span></h1>
+            </div>
+            <div class="stats-bar" id="stats-bar">
+                <div class="stat-item">
+                    <span class="label">In Stock</span>
+                    <span class="value in-stock" id="stat-in-stock">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Out of Stock</span>
+                    <span class="value out-of-stock" id="stat-out-of-stock">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Total</span>
+                    <span class="value" id="stat-total">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="add-product-section">
+                <div class="input-group">
+                    <i class="fa-solid fa-link"></i>
+                    <input type="text" id="product-url" placeholder="Paste Amul product URL here...">
+                    <button id="add-btn" onclick="addProduct()">
+                        <span class="btn-text">Track</span>
+                        <i class="fa-solid fa-plus"></i>
+                        <div class="loader" id="add-loader"></div>
+                    </button>
+                </div>
+            </section>
+
+            <section class="products-grid" id="products-grid">
+                <!-- Products will be injected here -->
+            </section>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
