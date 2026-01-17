@@ -11,8 +11,11 @@ class StockCommands(commands.Cog):
     @app_commands.command(name="start", description="Start tracking a product URL")
     @app_commands.describe(url="The Amul product URL to track")
     async def start(self, interaction: discord.Interaction, url: str):
-        await interaction.response.defer(ephemeral=False)
-        
+        try:
+            await interaction.response.defer(ephemeral=False)
+        except discord.errors.InteractionResponded:
+            pass
+            
         # Validation
         if not checker.is_valid_amul_url(url):
             await interaction.followup.send("❌ Invalid URL. Please provide a valid URL from shop.amul.com/product/...", ephemeral=True)
@@ -43,43 +46,68 @@ class StockCommands(commands.Cog):
     @app_commands.command(name="stop", description="Stop tracking a product")
     @app_commands.describe(url="The product URL to remove")
     async def stop(self, interaction: discord.Interaction, url: str):
-        await interaction.response.defer(ephemeral=False)
-        
-        is_subbed = await db.is_user_subscribed(str(interaction.user.id), url)
-        if not is_subbed:
-             await interaction.followup.send("❌ You are not tracking this product.", ephemeral=True)
-             return
-             
-        await db.unsubscribe_user(str(interaction.user.id), url)
-        await interaction.followup.send("🗑️ Removed product from your tracking list.")
+        try:
+            is_subbed = await db.is_user_subscribed(str(interaction.user.id), url)
+            if not is_subbed:
+                 if not interaction.response.is_done():
+                    await interaction.response.send_message("❌ You are not tracking this product.", ephemeral=True)
+                 else:
+                    await interaction.followup.send("❌ You are not tracking this product.", ephemeral=True)
+                 return
+                 
+            await db.unsubscribe_user(str(interaction.user.id), url)
+            if not interaction.response.is_done():
+                await interaction.response.send_message("🗑️ Removed product from your tracking list.")
+            else:
+                await interaction.followup.send("🗑️ Removed product from your tracking list.")
+        except Exception as e:
+            msg = f"❌ Error removing product: {e}"
+            if interaction.response.is_done():
+                await interaction.followup.send(msg)
+            else:
+                await interaction.response.send_message(msg, ephemeral=True)
 
     @app_commands.command(name="list", description="Show all products you are tracking")
     async def list_products(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        
-        products = await db.get_user_products(str(interaction.user.id))
-        
-        if not products:
-             await interaction.followup.send("📭 You are not tracking any products.")
-             return
-             
-        embed = discord.Embed(title="📋 Your Tracking List", color=discord.Color.blue())
-        
-        for p in products:
-            status_emoji = "✅" if p['status'] == 'in_stock' else "❌" if p['status'] == 'out_of_stock' else "❓"
-            embed.add_field(
-                name=f"{status_emoji} {p.get('name', 'Unknown')}",
-                value=f"[Link]({p['url']})\nStatus: {p['status']}",
-                inline=False
-            )
+        try:
+            products = await db.get_user_products(str(interaction.user.id))
             
-        await interaction.followup.send(embed=embed)
+            if not products:
+                 if not interaction.response.is_done():
+                    await interaction.response.send_message("📭 You are not tracking any products.")
+                 else:
+                    await interaction.followup.send("📭 You are not tracking any products.")
+                 return
+                 
+            embed = discord.Embed(title="📋 Your Tracking List", color=discord.Color.blue())
+            
+            for p in products:
+                status_emoji = "✅" if p['status'] == 'in_stock' else "❌" if p['status'] == 'out_of_stock' else "❓"
+                embed.add_field(
+                    name=f"{status_emoji} {p.get('name', 'Unknown')}",
+                    value=f"[Link]({p['url']})\nStatus: {p['status']}",
+                    inline=False
+                )
+            
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
+        except Exception as e:
+            msg = f"❌ Error listing products: {e}"
+            if interaction.response.is_done():
+                await interaction.followup.send(msg)
+            else:
+                await interaction.response.send_message(msg, ephemeral=True)
 
     @app_commands.command(name="status", description="Check stock status without tracking")
     @app_commands.describe(url="The Amul product URL to check")
     async def status(self, interaction: discord.Interaction, url: str):
-        await interaction.response.defer()
-        
+        try:
+            await interaction.response.defer()
+        except discord.errors.InteractionResponded:
+            pass
+            
         if not checker.is_valid_amul_url(url):
             await interaction.followup.send("❌ Invalid URL.")
             return

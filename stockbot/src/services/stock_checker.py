@@ -83,20 +83,36 @@ class StockChecker:
                  image_url = await img.get_attribute('src')
             
             # Stock Status Logic
-            page_text = (await page.content()).lower()
-            
             status = 'unknown'
+            is_out_of_stock = False
             
-            # Check for Notify Me (Out of Stock)
-            has_notify_me = "notify me" in page_text or await page.locator('.product_enquiry').count() > 0
-            has_sold_out = "sold out" in page_text
+            # Primary Indicators:
+            # 1. 'Notify Me' button (.product_enquiry) - Only present when out of stock
+            notify_me = page.locator('.product_enquiry')
             
-            # Check for Add to Cart (In Stock)
-            has_add_to_cart = "add to cart" in page_text or await page.locator('.add-to-cart').count() > 0
+            # 2. 'Add to Cart' button (.add-to-cart) - Present on both, but disabled when out of stock
+            add_to_cart = page.locator('.add-to-cart').first
+            
+            # 3. 'Sold Out' banner specifically in main product area (alert-danger banner)
+            sold_out_banner = page.locator('.alert.alert-danger:has-text("Sold Out")')
 
-            if has_notify_me or has_sold_out:
+            if await notify_me.count() > 0 and await notify_me.is_visible():
+                is_out_of_stock = True
+            elif await sold_out_banner.count() > 0:
+                # Banner exists, check visibility
+                is_out_of_stock = await sold_out_banner.is_visible()
+            elif await add_to_cart.count() > 0:
+                # Check for 'disabled' class or attribute
+                classes = await add_to_cart.get_attribute('class') or ""
+                disabled_attr = await add_to_cart.get_attribute('disabled') or ""
+                if 'disabled' in classes.lower() or disabled_attr == 'true' or disabled_attr == '1':
+                    is_out_of_stock = True
+                else:
+                    status = 'in_stock'
+            
+            if is_out_of_stock:
                 status = 'out_of_stock'
-            elif has_add_to_cart:
+            elif status == 'unknown' and await add_to_cart.count() > 0:
                 status = 'in_stock'
 
             return {
